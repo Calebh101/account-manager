@@ -30,8 +30,8 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "97e10ad516b07826930a53879302cf9080645af2"
-      url: "https://github.com/Calebh101/calebh101_server"
+      resolved-ref: "85b1c8863657a0edc97745d9bc8f219ecbb5e3ea"
+      url: "https://github.com/Calebh101/calebh101_server.git"
     source: git
     version: "1.0.0"
   characters:
@@ -271,9 +271,9 @@ packages:
     dependency: transitive
     description:
       path: api_client
-      ref: "97e10ad516b07826930a53879302cf9080645af2"
-      resolved-ref: "97e10ad516b07826930a53879302cf9080645af2"
-      url: "https://github.com/Calebh101/calebh101_server"
+      ref: "85b1c8863657a0edc97745d9bc8f219ecbb5e3ea"
+      resolved-ref: "85b1c8863657a0edc97745d9bc8f219ecbb5e3ea"
+      url: "https://github.com/Calebh101/calebh101_server.git"
     source: git
     version: "1.0.0"
   path:
@@ -553,6 +553,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.5"
+  validators:
+    dependency: "direct main"
+    description:
+      name: validators
+      sha256: "884515951f831a9c669a41ed6c4d3c61c2a0e8ec6bca761a4480b28e99cecf5d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   vector_math:
     dependency: transitive
     description:

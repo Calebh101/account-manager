@@ -14,9 +14,19 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: TextButton(onPressed: () {
-          SimpleNavigator.navigate(context: context, page: VerifyEmail(), mode: NavigatorMode.pushReplacement);
-        }, child: Text("Verify Email")),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("This application is not finished yet.", softWrap: true),
+              Text("To verify your email with Calebh101 Services, press the button below.", softWrap: true),
+              TextButton(onPressed: () {
+                SimpleNavigator.navigate(context: context, page: VerifyEmail(), mode: NavigatorMode.pushReplacement);
+              }, child: Text("Verify Email")),
+            ],
+          ),
+        ),
       ),
     );
   }
