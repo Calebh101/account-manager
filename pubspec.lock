@@ -30,7 +30,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "667707bb8adfc440d47db336eb32c4b565f0bdb3"
+      resolved-ref: "97e10ad516b07826930a53879302cf9080645af2"
       url: "https://github.com/Calebh101/calebh101_server"
     source: git
     version: "1.0.0"
@@ -216,7 +216,7 @@ packages:
       path: "."
       ref: main
       resolved-ref: "935ca2328c7e04f16f570b1c650c3b1912659658"
-      url: "https://github.com/Calebh101/localpkg-flutter-2"
+      url: "https://github.com/Calebh101/localpkg-flutter-2.git"
     source: git
     version: "2.0.0"
   logging:
@@ -271,8 +271,8 @@ packages:
     dependency: transitive
     description:
       path: api_client
-      ref: "667707bb8adfc440d47db336eb32c4b565f0bdb3"
-      resolved-ref: "667707bb8adfc440d47db336eb32c4b565f0bdb3"
+      ref: "97e10ad516b07826930a53879302cf9080645af2"
+      resolved-ref: "97e10ad516b07826930a53879302cf9080645af2"
       url: "https://github.com/Calebh101/calebh101_server"
     source: git
     version: "1.0.0"
@@ -457,6 +457,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  styled_logger:
+    dependency: "direct main"
+    description:
+      name: styled_logger
+      sha256: "51f3713bba89dff3ba180a9df61c175548a86c408196cc603ce31ee1ed7987ab"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
   term_glyph:
     dependency: transitive
     description:
