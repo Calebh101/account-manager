@@ -114,7 +114,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
 
                 if (result?.t != null) {
                   final t = result!.t!;
-                  if (context.mounted) SnackBarManager.show(context, t.message ?? "Email verified.");
+                  if (context.mounted) SnackBarManager.show(context, "Email verified. You may now sign in.");
                 } else if (result?.f != null) {
                   final f = result!.f!;
                   Logger.print("Request failed: $f");
