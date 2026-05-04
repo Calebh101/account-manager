@@ -30,7 +30,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: d871eec11e36c335598295505a48acc78a4ec18e
+      resolved-ref: "8015332687e29e5de1667e10862ae215d18140b1"
       url: "https://github.com/Calebh101/calebh101_server"
     source: git
     version: "1.0.0"
@@ -271,8 +271,8 @@ packages:
     dependency: transitive
     description:
       path: api_client
-      ref: d871eec11e36c335598295505a48acc78a4ec18e
-      resolved-ref: d871eec11e36c335598295505a48acc78a4ec18e
+      ref: "8015332687e29e5de1667e10862ae215d18140b1"
+      resolved-ref: "8015332687e29e5de1667e10862ae215d18140b1"
       url: "https://github.com/Calebh101/calebh101_server"
     source: git
     version: "1.0.0"

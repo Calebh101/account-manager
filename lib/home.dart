@@ -1,4 +1,6 @@
+import 'package:calebh101_account_page/main.dart';
 import 'package:calebh101_account_page/verify_email.dart';
+import 'package:calebh101_server/calebh101_server.dart';
 import 'package:flutter/material.dart';
 import 'package:localpkg_flutter/localpkg.dart';
 
@@ -10,6 +12,20 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final api = DefaultApi(client);
+
+  String? error;
+  AccountDetailsPost200ResponseData? data;
+
+  Future<void> fetch() async {
+    onNeedsLogin = (e) {};
+
+    final result = await request(() => api.accountDetailsPost());
+    if (result == null) return;
+    data = result.t?.data;
+    error = result.f?.message ?? (result.t == null ? "No response received" : null);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

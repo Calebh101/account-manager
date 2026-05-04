@@ -2,7 +2,6 @@ import 'package:calebh101_account_page/main.dart';
 import 'package:calebh101_server/calebh101_server.dart';
 import 'package:flutter/material.dart';
 import 'package:localpkg_flutter/localpkg.dart';
-import 'package:styled_logger/styled_logger.dart';
 import 'package:validators/validators.dart';
 
 class VerifyEmail extends StatefulWidget {
@@ -105,7 +104,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
             Spacer(),
             ElevatedButton(
               onPressed: () async {
-                Logger.print("Requesting with email ${widget.email}");
+                Logger.print("Verify", "Requesting with email ${widget.email}");
                 if (!state.validate()) return;
                 SnackBarManager.show(context, "Loading...");
 
@@ -117,10 +116,10 @@ class _VerifyEmailState extends State<VerifyEmail> {
                   if (context.mounted) SnackBarManager.show(context, "Email verified. You may now sign in.");
                 } else if (result?.f != null) {
                   final f = result!.f!;
-                  Logger.print("Request failed: $f");
+                  Logger.print("Verify", "Request failed: $f");
                   if (context.mounted) SnackBarManager.show(context, f.message ?? "Email not verified. Unknown error: ${f.e}");
                 } else {
-                  Logger.print("Request failed");
+                  Logger.print("Verify", "Request failed");
                   if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your email was verified or not.");
                 }
               },

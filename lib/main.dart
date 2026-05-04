@@ -3,12 +3,10 @@ import 'package:calebh101_account_page/verify_email.dart';
 import 'package:calebh101_server/calebh101_server.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:styled_logger/styled_logger.dart';
 
 late ApiClient client;
 
 void main() {
-  if (kDebugMode) Logger.enable();
   client = Calebh101Client.setup(kDebugMode ? Calebh101Client.localBasePath() : Calebh101Client.publicBasePath);
   runApp(const MyApp());
 }
