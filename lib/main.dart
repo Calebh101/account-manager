@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
       initialRoute: "/",
-      /*onGenerateRoute: (settings) {
+      onGenerateRoute: (settings) {
         if (settings.name == '/verifyEmail') {
           final email = Uri.base.queryParameters["email"];
           final code = Uri.base.queryParameters["code"];
@@ -52,8 +52,8 @@ class MyApp extends StatelessWidget {
           builder: (_) => Home(),
           settings: settings,
         );
-      },*/
-      routes: {
+      },
+      /*routes: {
         "/": (context) => Home(),
         "/verifyEmail": (context) {
           final email = Uri.base.queryParameters["email"];
@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
           final session = Uri.base.queryParameters["session"];
           return VerifyEmail(email: email, sessionId: session, verificationCode: code);
         },
-      },
+      },*/
     );
   }
 }
