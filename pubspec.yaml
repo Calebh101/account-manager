@@ -35,15 +35,17 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
-  calebh101_server:
+  calebh101_server_flutter:
     git:
-      url: https://github.com/Calebh101/calebh101_server
+      url: https://github.com/Calebh101/calebh101_server.git
       ref: main
+      path: flutter
 
   localpkg_flutter:
     git:
       url: https://github.com/Calebh101/localpkg-flutter-2.git
       ref: main
+
   styled_logger: ^1.0.2
   validators: ^3.0.0
 

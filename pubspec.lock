@@ -26,14 +26,23 @@ packages:
     source: hosted
     version: "2.1.2"
   calebh101_server:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "."
-      ref: main
-      resolved-ref: "8015332687e29e5de1667e10862ae215d18140b1"
-      url: "https://github.com/Calebh101/calebh101_server"
+      ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
+      resolved-ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
+      url: "https://github.com/Calebh101/calebh101_server.git"
     source: git
     version: "1.0.0"
+  calebh101_server_flutter:
+    dependency: "direct main"
+    description:
+      path: flutter
+      ref: main
+      resolved-ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
+      url: "https://github.com/Calebh101/calebh101_server.git"
+    source: git
+    version: "0.0.0"
   characters:
     dependency: transitive
     description:
@@ -271,9 +280,9 @@ packages:
     dependency: transitive
     description:
       path: api_client
-      ref: "8015332687e29e5de1667e10862ae215d18140b1"
-      resolved-ref: "8015332687e29e5de1667e10862ae215d18140b1"
-      url: "https://github.com/Calebh101/calebh101_server"
+      ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
+      resolved-ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
+      url: "https://github.com/Calebh101/calebh101_server.git"
     source: git
     version: "1.0.0"
   path:
@@ -610,5 +619,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.10.8 <4.0.0"
+  dart: ">=3.11.0 <4.0.0"
   flutter: ">=3.38.4"
