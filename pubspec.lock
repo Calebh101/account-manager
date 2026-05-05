@@ -29,8 +29,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
-      resolved-ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
+      ref: "4e60f9264e44e39d636811d5a6eba245ed959b2b"
+      resolved-ref: "4e60f9264e44e39d636811d5a6eba245ed959b2b"
       url: "https://github.com/Calebh101/calebh101_server.git"
     source: git
     version: "1.0.0"
@@ -39,7 +39,7 @@ packages:
     description:
       path: flutter
       ref: main
-      resolved-ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
+      resolved-ref: "4e60f9264e44e39d636811d5a6eba245ed959b2b"
       url: "https://github.com/Calebh101/calebh101_server.git"
     source: git
     version: "0.0.0"
@@ -68,7 +68,7 @@ packages:
     source: hosted
     version: "1.0.0"
   collection:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: collection
       sha256: "2f5709ae4d3d59dd8f7cd309b4e023046b57d8a6c82130785d2b0e5868084e76"
@@ -171,7 +171,7 @@ packages:
     source: hosted
     version: "4.1.2"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
@@ -280,8 +280,8 @@ packages:
     dependency: transitive
     description:
       path: api_client
-      ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
-      resolved-ref: "1fa14f7736f5de4efea2249556547ae4749b9dd0"
+      ref: "4e60f9264e44e39d636811d5a6eba245ed959b2b"
+      resolved-ref: "4e60f9264e44e39d636811d5a6eba245ed959b2b"
       url: "https://github.com/Calebh101/calebh101_server.git"
     source: git
     version: "1.0.0"
@@ -374,13 +374,13 @@ packages:
     source: hosted
     version: "3.0.0"
   shared_preferences:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: shared_preferences
-      sha256: "2939ae520c9024cb197fc20dee269cd8cdbf564c8b5746374ec6cacdc5169e64"
+      sha256: c3025c5534b01739267eb7d76959bbc25a6d10f6988e1c2a3036940133dd10bf
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.4"
+    version: "2.5.5"
   shared_preferences_android:
     dependency: transitive
     description:

@@ -1,8 +1,8 @@
 import 'package:calebh101_account_page/main.dart';
-import 'package:calebh101_account_page/verify_email.dart';
-import 'package:calebh101_server/calebh101_server.dart';
 import 'package:calebh101_server_flutter/calebh101_server_flutter.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:localpkg_flutter/localpkg.dart';
 
 class Home extends StatefulWidget {
@@ -20,39 +20,168 @@ class _HomeState extends State<Home> {
 
   Future<void> fetch() async {
     onNeedsLogin = (e) async {
-      SimpleNavigator.navigate(context: context, page: LoginPage(client: client), mode: NavigatorMode.pushReplacement);
+      await context.navigator.push(MaterialPageRoute(builder: (context) => LoginPage(client: client)));
+      fetch();
     };
 
     final result = await request(() => api.accountDetailsPost());
+    Logger.print("Home", "Response: ${result.runtimeType}");
     if (result == null) return;
     data = result.t?.data;
     error = result.f?.message ?? (result.t == null ? "No response received" : null);
+    setState(() {});
+  }
+
+  void reload() async {
+    data = null;
+    error = null;
+
+    setState(() {});
+    fetch();
+  }
+
+  @override
+  void initState() {
+    fetch();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(onPressed: () {
+            reload();
+          }, icon: Icon(Icons.refresh)),
+        ],
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: data != null ? (Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Received data: ${data.runtimeType}", softWrap: true),
-            ],
-          )) : (error != null ? Text("Error: $error") : Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
-              ),
-              TextButton(onPressed: () {
-                SimpleNavigator.navigate(context: context, page: VerifyEmail(), mode: NavigatorMode.push);
-              }, child: Text("Verify Email")),
-            ],
-          )),
+          child: data != null ? Builder(
+            builder: (context) {
+              final sessions = data!.sessions..sorted((a, b) => b.used.compareTo(a.used));
+
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Hey there,").fontSize(36),
+                  Text("${data!.email}!").fontSize(24),
+                  SizedBox(height: 20),
+                  Text("Account created: ${DateFormat("MMM d, y @ h:mm a").format(data!.created)}"),
+                  Text("Account updated: ${DateFormat("MMM d, y @ h:mm a").format(data!.updated)}"),
+                  SizedBox(height: 20),
+                  ElevatedButton(onPressed: () async {
+                    await context.navigator.push(MaterialPageRoute(builder: (context) => SessionPage(sessions: sessions)));
+                    reload();
+                  }, child: Text("${sessions.length} Active Sessions")),
+                ],
+              );
+            }
+          ) : (error != null ? Text("Error: $error") : CircularProgressIndicator()),
         ),
       ),
     );
+  }
+}
+
+class SessionPage extends StatefulWidget {
+  final List<AccountDetailsPost200ResponseDataSessionsInner> sessions;
+  const SessionPage({super.key, required this.sessions});
+
+  @override
+  State<SessionPage> createState() => _SessionPageState();
+}
+
+class _SessionPageState extends State<SessionPage> {
+  @override
+  Widget build(BuildContext context) {
+    final sessions = widget.sessions;
+
+    return Scaffold(
+      appBar: AppBar(title: Text("${sessions.length} Sessions")),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 24,
+            children: sessions.map((x) => SessionWidget(session: x)).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SessionWidget extends StatefulWidget {
+  final AccountDetailsPost200ResponseDataSessionsInner session;
+  const SessionWidget({super.key, required this.session});
+
+  @override
+  State<SessionWidget> createState() => _SessionWidgetState();
+}
+
+class _SessionWidgetState extends State<SessionWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(onPressed: () {
+      final _context = context;
+
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => ListView(
+          shrinkWrap: true,
+          children: [
+            ListTile(title: Text('View ID'), onTap: () async {
+              await SimpleDialogue.show(context: context, title: "ID", content: SelectableText(widget.session.id), copy: true);
+            }),
+            ListTile(title: Text('Delete', style: TextStyle(color: Colors.redAccent)), onTap: () async {
+              final confirm = await ConfirmationDialogue.show(context: context, title: "Are you sure?", description: "This device will be logged out immediately.");
+              if (confirm != true) return;
+              SnackBarManager.show(context, "Loading...");
+
+              void pop({bool outer = true}) {
+                if (context.mounted) Navigator.pop(context);
+                if (outer && _context.mounted) Navigator.pop(_context);
+              }
+
+              final result = await request(() => DefaultApi(client).authSessionDelete(authSessionDeleteRequest: AuthSessionDeleteRequest(id: widget.session.id)));
+              if (result == null) return pop(outer: false);
+
+              if (result.f != null) {
+                SnackBarManager.show(context, "Unable to delete session: ${result.f!.message}");
+                return;
+              }
+
+              if (result.t != null) {
+                SnackBarManager.show(context, "Session deleted.");
+                pop();
+                return;
+              }
+            }),
+            ListTile(title: Text('Cancel'), onTap: () => Navigator.pop(context)),
+          ],
+        ),
+      );
+    }, child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        spacing: 8,
+        children: [
+          SelectableText([?widget.session.ip, ?widget.session.userAgent].nullIfEmpty?.join(" ") ?? "No details", style: TextStyle(fontSize: 20)),
+          SelectableText("Created: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.created)}"),
+          SelectableText("Last used: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.used)}"),
+          SelectableText("Expires: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.expires)}"),
+          if (widget.session.id == prefs.getString("authentication")) Text("This Session", style: TextStyle(color: Colors.amberAccent)),
+          SelectableText(widget.session.id, style: TextStyle(fontSize: 8, color: Colors.grey)),
+        ],
+      ),
+    ), style: ElevatedButton.styleFrom(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ));
   }
 }
