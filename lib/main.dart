@@ -3,6 +3,7 @@ import 'package:calebh101_account_page/verify_email.dart';
 import 'package:calebh101_server_flutter/calebh101_server_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 late ApiClient client;
@@ -17,6 +18,7 @@ void main() async {
   client = Calebh101Client.setup(path);
 
   await setAuth(client);
+  usePathUrlStrategy();
   runApp(const MyApp());
 }
 
@@ -31,6 +33,26 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       debugShowCheckedModeBanner: false,
       initialRoute: "/",
+      /*onGenerateRoute: (settings) {
+        if (settings.name == '/verifyEmail') {
+          final email = Uri.base.queryParameters["email"];
+          final code = Uri.base.queryParameters["code"];
+          final session = Uri.base.queryParameters["session"];
+
+          return MaterialPageRoute(
+            builder: (_) => VerifyEmail(
+              email: email,
+              sessionId: session,
+              verificationCode: code,
+            ),
+            settings: settings,
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => Home(),
+          settings: settings,
+        );
+      },*/
       routes: {
         "/": (context) => Home(),
         "/verifyEmail": (context) {
