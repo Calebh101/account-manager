@@ -1,9 +1,11 @@
 import 'package:calebh101_account_page/home.dart';
-import 'package:calebh101_account_page/verify_email.dart';
+import 'package:calebh101_account_page/verify.dart';
 import 'package:calebh101_server_flutter/calebh101_server_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:localpkg_flutter/localpkg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:validators/validators.dart';
 
 late ApiClient client;
 late SharedPreferences prefs;
@@ -25,18 +27,53 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late Widget widget;
+    Widget? widget;
     final uri = Uri.base;
 
-    if (uri.queryParameters.containsKey("verifyEmail")) {
-      widget = VerifyEmail(
-        email: uri.queryParameters["email"],
-        sessionId: uri.queryParameters["session"],
-        verificationCode: uri.queryParameters["code"],
-      );
-    } else {
-      widget = const Home();
+    if (uri.queryParameters["p"] != null) {
+      switch (uri.queryParameters["p"]) {
+        case "verifyEmail":
+          widget = VerifyPage(
+            "Email", {
+              "email": VerifyPageDetails(prettyName: "Email", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (!isEmail(input)) return "Please provide a valid email.";
+                return null;
+              }),
+              "code": VerifyPageDetails(prettyName: "Verification Code", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length != 6) return "Code must be 6 characters.";
+                return null;
+              }),
+              "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length != 12) return "Code must be 12 characters.";
+                return null;
+              }),
+            },
+            query: uri.queryParameters,
+            request: (context, api, parameters) async {
+              final result = await request(() async => api.authVerifyUserPost(authVerifyUserPostRequest: AuthVerifyUserPostRequest(email: parameters["email"]!.value, code: parameters["verificationCode"]!.value, sessionId: parameters["sessionId"]!.value)));
+
+              if (result?.t != null) {
+                final t = result!.t!;
+                if (context.mounted) SnackBarManager.show(context, t.message);
+              } else if (result?.f != null) {
+                final f = result!.f!;
+                Logger.print("Verify", "Request failed: $f");
+                if (context.mounted) SnackBarManager.show(context, f.message ?? "Email not verified. Unknown error: ${f.e}");
+              } else {
+                Logger.print("Verify", "Request failed");
+                if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your email was verified or not.");
+              }
+            },
+          );
+
+          break;
+      }
     }
+
+    widget ??= const Home();
 
     return MaterialApp(
       title: 'Calebh101 Account',
