@@ -22,6 +22,10 @@ void main() async {
   runApp(const MyApp());
 }
 
+extension on String {
+  String? get nullIfEmpty => isEmpty ? null : this;
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -29,12 +33,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget? widget;
     final uri = Uri.base;
+    const pathX = String.fromEnvironment("QUERY_PATH");
+    final path = pathX.nullIfEmpty ?? uri.queryParameters["p"]?.nullIfEmpty;
+    Logger.print("App", "Found path: $path");
 
-    if (uri.queryParameters["p"] != null) {
-      switch (uri.queryParameters["p"]) {
+    if (path != null) {
+      switch (path) {
         case "verifyEmail":
           widget = VerifyPage(
-            "Email", {
+            "Verify Your Email", {
               "email": VerifyPageDetails(prettyName: "Email", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
                 if (!isEmail(input)) return "Please provide a valid email.";
@@ -53,7 +60,7 @@ class MyApp extends StatelessWidget {
             },
             query: uri.queryParameters,
             request: (context, api, parameters) async {
-              final result = await request(() async => api.authVerifyUserPost(authVerifyUserPostRequest: AuthVerifyUserPostRequest(email: parameters["email"]!.value, code: parameters["verificationCode"]!.value, sessionId: parameters["sessionId"]!.value)));
+              final result = await request(() async => api.authVerifyUserPost(authVerifyUserPostRequest: AuthVerifyUserPostRequest(email: parameters["email"]!.value, code: parameters["code"]!.value, sessionId: parameters["sessionId"]!.value)));
 
               if (result?.t != null) {
                 final t = result!.t!;
@@ -65,6 +72,77 @@ class MyApp extends StatelessWidget {
               } else {
                 Logger.print("Verify", "Request failed");
                 if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your email was verified or not.");
+              }
+            },
+          );
+
+          break;
+        case "changeEmail1":
+          widget = VerifyPage(
+            "Change Your Email", {
+              "email": VerifyPageDetails(prettyName: "Email", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (!isEmail(input)) return "Please provide a valid email.";
+                return null;
+              }),
+              "code": VerifyPageDetails(prettyName: "Verification Code", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length != 6) return "Code must be 6 characters.";
+                return null;
+              }),
+              "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length != 12) return "Code must be 12 characters.";
+                return null;
+              }),
+            },
+            query: uri.queryParameters,
+            request: (context, api, parameters) async {
+              final result = await request(() async => api.accountEmailChangeVerifyOldPost(accountEmailChangeVerifyOldPostRequest: AccountEmailChangeVerifyOldPostRequest(email: parameters["email"]!.value, code: parameters["code"]!.value, session: parameters["sessionId"]!.value)));
+
+              if (result?.t != null) {
+                final t = result!.t!;
+                if (context.mounted) SnackBarManager.show(context, t.message);
+              } else if (result?.f != null) {
+                final f = result!.f!;
+                Logger.print("Verify", "Request failed: $f");
+                if (context.mounted) SnackBarManager.show(context, f.message ?? "Email change not verified. Unknown error: ${f.e}");
+              } else {
+                Logger.print("Verify", "Request failed");
+                if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your request was verified or not.");
+              }
+            },
+          );
+
+          break;
+        case "changeEmail2":
+          widget = VerifyPage(
+            "Change Your Email", {
+              "email": VerifyPageDetails(prettyName: "Email", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (!isEmail(input)) return "Please provide a valid email.";
+                return null;
+              }),
+              "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length != 12) return "Code must be 12 characters.";
+                return null;
+              }),
+            },
+            query: uri.queryParameters,
+            request: (context, api, parameters) async {
+              final result = await request(() async => api.accountEmailChangeVerifyNewPost(accountEmailChangeVerifyNewPostRequest: AccountEmailChangeVerifyNewPostRequest(code: parameters["code"]!.value, session: parameters["sessionId"]!.value)));
+
+              if (result?.t != null) {
+                final t = result!.t!;
+                if (context.mounted) SnackBarManager.show(context, t.message);
+              } else if (result?.f != null) {
+                final f = result!.f!;
+                Logger.print("Verify", "Request failed: $f");
+                if (context.mounted) SnackBarManager.show(context, f.message ?? "Email change not verified. Unknown error: ${f.e}");
+              } else {
+                Logger.print("Verify", "Request failed");
+                if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your request was verified or not.");
               }
             },
           );

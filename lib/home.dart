@@ -145,7 +145,7 @@ class _SessionWidgetState extends State<SessionWidget> {
                 if (outer && _context.mounted) Navigator.pop(_context);
               }
 
-              final result = await request(() => DefaultApi(client).authSessionDelete(authSessionDeleteRequest: AuthSessionDeleteRequest(id: widget.session.id)));
+              final result = await request(() => DefaultApi(client).accountSessionDelete(accountSessionDeleteRequest: AccountSessionDeleteRequest(id: widget.session.id)));
               if (result == null) return pop(outer: false);
 
               if (result.f != null) {

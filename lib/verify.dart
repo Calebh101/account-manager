@@ -63,7 +63,7 @@ class _VerifyEmailState extends State<VerifyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Verify ${widget.what} for Calebh101 Services"),
+        title: Text(widget.what),
         centerTitle: true,
       ),
       body: Padding(
