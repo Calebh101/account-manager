@@ -9,6 +9,7 @@ import 'package:validators/validators.dart';
 
 late ApiClient client;
 late SharedPreferences prefs;
+String? inputtedQueryPath;
 
 void main() async {
   final path = kDebugMode ? Calebh101Client.localBasePath() : Calebh101Client.publicBasePath();
@@ -19,11 +20,61 @@ void main() async {
   client = Calebh101Client.setup(path);
 
   await setAuth(client);
-  runApp(const MyApp());
+  runApp(kDebugMode ? DebugApp() : MyApp());
 }
 
 extension on String {
   String? get nullIfEmpty => isEmpty ? null : this;
+}
+
+class DebugApp extends StatefulWidget {
+  const DebugApp({super.key});
+
+  @override
+  State<DebugApp> createState() => _DebugAppState();
+}
+
+class _DebugAppState extends State<DebugApp> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Selector',
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Spacer(),
+              Spacer(),
+              Spacer(),
+              Text(inputtedQueryPath ?? "Path not set"),
+              Spacer(),
+              ...["verifyEmail", "changeEmail1", "changeEmail2"].map((key) {
+                return TextButton(onPressed: () {
+                  inputtedQueryPath = key;
+                  setState(() {});
+                }, child: Text(key));
+              }),
+              Spacer(),
+              TextButton(onPressed: () {
+                inputtedQueryPath = null;
+                setState(() {});
+              }, child: Text("Reset")),
+              TextButton(onPressed: () {
+                runApp(MyApp());
+              }, child: Text("Go")),
+              Spacer(),
+              Spacer(),
+              Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -33,8 +84,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget? widget;
     final uri = Uri.base;
-    const pathX = String.fromEnvironment("QUERY_PATH");
-    final path = pathX.nullIfEmpty ?? uri.queryParameters["p"]?.nullIfEmpty;
+    final path = inputtedQueryPath ?? uri.queryParameters["p"]?.nullIfEmpty;
     Logger.print("App", "Found path: $path");
 
     if (path != null) {
@@ -54,7 +104,7 @@ class MyApp extends StatelessWidget {
               }),
               "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (input.length != 12) return "Code must be 12 characters.";
+                if (input.length != 16) return "Code must be 16 characters.";
                 return null;
               }),
             },
@@ -80,11 +130,6 @@ class MyApp extends StatelessWidget {
         case "changeEmail1":
           widget = VerifyPage(
             "Change Your Email", {
-              "email": VerifyPageDetails(prettyName: "Email", validator: (input) {
-                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (!isEmail(input)) return "Please provide a valid email.";
-                return null;
-              }),
               "code": VerifyPageDetails(prettyName: "Verification Code", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
                 if (input.length != 6) return "Code must be 6 characters.";
@@ -92,13 +137,13 @@ class MyApp extends StatelessWidget {
               }),
               "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (input.length != 12) return "Code must be 12 characters.";
+                if (input.length != 16) return "Code must be 16 characters.";
                 return null;
               }),
             },
             query: uri.queryParameters,
             request: (context, api, parameters) async {
-              final result = await request(() async => api.accountEmailChangeVerifyOldPost(accountEmailChangeVerifyOldPostRequest: AccountEmailChangeVerifyOldPostRequest(email: parameters["email"]!.value, code: parameters["code"]!.value, session: parameters["sessionId"]!.value)));
+              final result = await request(() async => api.accountEmailChangeVerifyOldPost(accountEmailChangeVerifyOldPostRequest: AccountEmailChangeVerifyOldPostRequest(code: parameters["code"]!.value, session: parameters["sessionId"]!.value)));
 
               if (result?.t != null) {
                 final t = result!.t!;
@@ -118,20 +163,20 @@ class MyApp extends StatelessWidget {
         case "changeEmail2":
           widget = VerifyPage(
             "Change Your Email", {
-              "email": VerifyPageDetails(prettyName: "Email", validator: (input) {
+              "code": VerifyPageDetails(prettyName: "Verification Code", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (!isEmail(input)) return "Please provide a valid email.";
+                if (input.length != 6) return "Code must be 6 characters.";
                 return null;
               }),
               "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (input.length != 12) return "Code must be 12 characters.";
+                if (input.length != 16) return "Code must be 16 characters.";
                 return null;
               }),
             },
             query: uri.queryParameters,
             request: (context, api, parameters) async {
-              final result = await request(() async => api.accountEmailChangeVerifyNewPost(accountEmailChangeVerifyNewPostRequest: AccountEmailChangeVerifyNewPostRequest(code: parameters["code"]!.value, session: parameters["sessionId"]!.value)));
+              final result = await request(() async => api.accountEmailChangeVerifyNewPost(accountEmailChangeVerifyOldPostRequest: AccountEmailChangeVerifyOldPostRequest(code: parameters["code"]!.value, session: parameters["sessionId"]!.value)));
 
               if (result?.t != null) {
                 final t = result!.t!;

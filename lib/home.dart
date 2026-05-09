@@ -1,3 +1,4 @@
+import 'package:calebh101_account_page/dialogues.dart';
 import 'package:calebh101_account_page/main.dart';
 import 'package:calebh101_server_flutter/calebh101_server_flutter.dart';
 import 'package:collection/collection.dart';
@@ -76,6 +77,23 @@ class _HomeState extends State<Home> {
                     await context.navigator.push(MaterialPageRoute(builder: (context) => SessionPage(sessions: sessions)));
                     reload();
                   }, child: Text("${sessions.length} Active Sessions")),
+                  SizedBox(height: 20),
+                  TextButton(onPressed: () async {
+                    await signOut(client);
+                    reload();
+                  }, child: Text("Sign Out")),
+                  TextButton(onPressed: () async {
+                    await showDialog(context: context, builder: (context) => EmailChangeDialogue());
+                    reload();
+                  }, child: Text("Change Email")),
+                  TextButton(onPressed: () async {
+                    await showDialog(context: context, builder: (context) => PasswordChangeDialogue());
+                    reload();
+                  }, child: Text("Change Password")),
+                  TextButton(onPressed: () async {
+                    await showDialog(context: context, builder: (context) => DeleteAccountDialogue());
+                    reload();
+                  }, child: Text("Delete Account", style: TextStyle(color: Colors.redAccent))),
                 ],
               );
             }
