@@ -70,13 +70,14 @@ class _HomeState extends State<Home> {
                   Text("Hey there,").fontSize(36),
                   Text("${data!.email}!").fontSize(24),
                   SizedBox(height: 20),
-                  Text("Account created: ${DateFormat("MMM d, y @ h:mm a").format(data!.created)}"),
-                  Text("Account updated: ${DateFormat("MMM d, y @ h:mm a").format(data!.updated)}"),
+                  SelectableText("Account created: ${DateFormat("MMM d, y @ h:mm a").format(data!.created)}"),
+                  SelectableText("Account updated: ${DateFormat("MMM d, y @ h:mm a").format(data!.updated)}"),
+                  SelectableText("Current session ID: ${prefs.getString("authentication") ?? client.defaultHeaderMap["Authentication"] ?? "No ID"}"),
                   SizedBox(height: 20),
                   ElevatedButton(onPressed: () async {
                     await context.navigator.push(MaterialPageRoute(builder: (context) => SessionPage(sessions: sessions)));
                     reload();
-                  }, child: Text("${sessions.length} Active Sessions")),
+                  }, child: Text("${sessions.length} Active ${Word.fromCount(sessions.length, singular: Word("Session"))}")),
                   SizedBox(height: 20),
                   TextButton(onPressed: () async {
                     await signOut(client);

@@ -52,7 +52,7 @@ class _DebugAppState extends State<DebugApp> {
               Spacer(),
               Text(inputtedQueryPath ?? "Path not set"),
               Spacer(),
-              ...["verifyEmail", "changeEmail1", "changeEmail2"].map((key) {
+              ...["verifyEmail", "changeEmail1", "changeEmail2", "deleteAccount"].map((key) {
                 return TextButton(onPressed: () {
                   inputtedQueryPath = key;
                   setState(() {});
@@ -110,6 +110,7 @@ class MyApp extends StatelessWidget {
             },
             query: uri.queryParameters,
             request: (context, api, parameters) async {
+              SnackBarManager.show(context, "Loading...");
               final result = await request(() async => api.authVerifyUserPost(authVerifyUserPostRequest: AuthVerifyUserPostRequest(email: parameters["email"]!.value, code: parameters["code"]!.value, sessionId: parameters["sessionId"]!.value)));
 
               if (result?.t != null) {
@@ -143,6 +144,7 @@ class MyApp extends StatelessWidget {
             },
             query: uri.queryParameters,
             request: (context, api, parameters) async {
+              SnackBarManager.show(context, "Loading...");
               final result = await request(() async => api.accountEmailChangeVerifyOldPost(accountEmailChangeVerifyOldPostRequest: AccountEmailChangeVerifyOldPostRequest(code: parameters["code"]!.value, session: parameters["sessionId"]!.value)));
 
               if (result?.t != null) {
@@ -176,6 +178,7 @@ class MyApp extends StatelessWidget {
             },
             query: uri.queryParameters,
             request: (context, api, parameters) async {
+              SnackBarManager.show(context, "Loading...");
               final result = await request(() async => api.accountEmailChangeVerifyNewPost(accountEmailChangeVerifyOldPostRequest: AccountEmailChangeVerifyOldPostRequest(code: parameters["code"]!.value, session: parameters["sessionId"]!.value)));
 
               if (result?.t != null) {
@@ -188,6 +191,48 @@ class MyApp extends StatelessWidget {
               } else {
                 Logger.print("Verify", "Request failed");
                 if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your request was verified or not.");
+              }
+            },
+          );
+
+          break;
+        case "deleteAccount":
+          widget = VerifyPage(
+            "Delete Your Account", {
+              "code": VerifyPageDetails(prettyName: "Verification Code", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length != 6) return "Code must be 6 characters.";
+                return null;
+              }),
+              "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length != 16) return "Input must be 16 characters.";
+                return null;
+              }),
+              "password": VerifyPageDetails(prettyName: "Password", queryName: "", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                return null;
+              }),
+            },
+            button: "Delete",
+            query: uri.queryParameters,
+            request: (context, api, parameters) async {
+              final confirm = await ConfirmationDialogue.show(context: context, title: "Are you sure?", description: "This is immediate, destructive, and cannot be undone.\n\nIf you click yes, your account will immediately be deleted.");
+              if (confirm != true) return;
+              SnackBarManager.show(context, "Loading...");
+
+              final result = await request(() async => api.accountVerifyDelete(accountVerifyDeleteRequest: AccountVerifyDeleteRequest(code: parameters["code"]!.value, session: parameters["sessionId"]!.value, password: parameters["password"]!.value, iAmCompletelySureThatIWantToDoThisAndIKnowIWillHaveNoRegretsWhatsoeverAndIfIDoIKnowIAmCompletelyLiableForThisAndIAcknowledgeThatAllMyDataAndEverythingWillAlsoBeDeletedAndIWillDefinitelyNotRegretThisAndIfIDoIKnowIAmCompletelyLiableForThis: true)));
+
+              if (result?.t != null) {
+                final t = result!.t!;
+                if (context.mounted) SnackBarManager.show(context, t.message);
+              } else if (result?.f != null) {
+                final f = result!.f!;
+                Logger.print("Verify", "Request failed: $f");
+                if (context.mounted) SnackBarManager.show(context, f.message ?? "Account not deleted. Unknown error: ${f.e}");
+              } else {
+                Logger.print("Verify", "Request failed");
+                if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your account was deleted or not.");
               }
             },
           );

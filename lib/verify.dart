@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:calebh101_account_page/main.dart';
 import 'package:calebh101_server_flutter/calebh101_server_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:localpkg_flutter/localpkg.dart';
 
 class VerifyPageDetails<T> {
   final String prettyName;
@@ -53,7 +52,7 @@ class _VerifyEmailState extends State<VerifyPage> {
   @override
   void initState() {
     for (final param in widget.parameters.entries) {
-      controllers[param.key] = TextEditingController(text: widget.query[param.value.queryName ?? param.key]);
+      controllers[param.key] = TextEditingController(text: ((param.value.queryName?.trim().isNotEmpty ?? true) ? widget.query[param.value.queryName ?? param.key] : null));
     }
 
     super.initState();
@@ -98,7 +97,6 @@ class _VerifyEmailState extends State<VerifyPage> {
               onPressed: () async {
                 Logger.print("Verify", "Requesting...");
                 if (!state.validate()) return;
-                SnackBarManager.show(context, "Loading...");
 
                 final api = DefaultApi(client);
                 await widget.request.call(context, api, widget.parameters.map((k, v) => MapEntry(k, (value: getController(k).text, details: v))));
