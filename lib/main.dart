@@ -7,6 +7,8 @@ import 'package:localpkg_flutter/localpkg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:validators/validators.dart';
 
+const int sessionIdLength = 16;
+
 late ApiClient client;
 late SharedPreferences prefs;
 String? inputtedQueryPath;
@@ -23,9 +25,6 @@ void main() async {
   runApp(kDebugMode ? DebugApp() : MyApp());
 }
 
-extension on String {
-  String? get nullIfEmpty => isEmpty ? null : this;
-}
 
 class DebugApp extends StatefulWidget {
   const DebugApp({super.key});
@@ -102,9 +101,11 @@ class MyApp extends StatelessWidget {
                 if (input.length != 6) return "Code must be 6 characters.";
                 return null;
               }),
+              // THIS IS DIFFERENT FROM A REGULAR SESSION; THIS IS DEFINED SEPARATELY IN THE SERVER CODE.
+              // I don't know why I made it like this but I'm keeping it.
               "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (input.length != 16) return "Code must be 16 characters.";
+                if (input.length != 12) return "ID must be 12 characters.";
                 return null;
               }),
             },
@@ -138,7 +139,7 @@ class MyApp extends StatelessWidget {
               }),
               "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (input.length != 16) return "Code must be 16 characters.";
+                if (input.length != sessionIdLength) return "ID must be $sessionIdLength characters.";
                 return null;
               }),
             },
@@ -172,7 +173,7 @@ class MyApp extends StatelessWidget {
               }),
               "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (input.length != 16) return "Code must be 16 characters.";
+                if (input.length != sessionIdLength) return "ID must be $sessionIdLength characters.";
                 return null;
               }),
             },
@@ -206,7 +207,7 @@ class MyApp extends StatelessWidget {
               }),
               "sessionId": VerifyPageDetails(prettyName: "Session ID", queryName: "session", validator: (input) {
                 if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
-                if (input.length != 16) return "Input must be 16 characters.";
+                if (input.length != sessionIdLength) return "ID must be $sessionIdLength characters.";
                 return null;
               }),
               "password": VerifyPageDetails(prettyName: "Password", queryName: "", validator: (input) {
@@ -251,8 +252,4 @@ class MyApp extends StatelessWidget {
       home: widget,
     );
   }
-}
-
-extension NullIfEmpty<T> on Iterable<T> {
-  Iterable<T>? get nullIfEmpty => isEmpty ? null : this;
 }

@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:localpkg_flutter/localpkg.dart';
+import 'package:ua_parser/ua_parser.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -68,14 +69,14 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Hey there,").fontSize(36),
-                  Text("${data!.email}!").fontSize(24),
+                  Text("${data?.email}!").fontSize(24),
                   SizedBox(height: 20),
-                  SelectableText("Account created: ${DateFormat("MMM d, y @ h:mm a").format(data!.created)}"),
-                  SelectableText("Account updated: ${DateFormat("MMM d, y @ h:mm a").format(data!.updated)}"),
+                  SelectableText("Account created: ${DateFormat("MMM d, y @ h:mm a").format(data!.created.toLocal())}"),
+                  SelectableText("Account updated: ${DateFormat("MMM d, y @ h:mm a").format(data!.updated.toLocal())}"),
                   SelectableText("Current session ID: ${prefs.getString("authentication") ?? client.defaultHeaderMap["Authentication"] ?? "No ID"}"),
                   SizedBox(height: 20),
                   ElevatedButton(onPressed: () async {
-                    await context.navigator.push(MaterialPageRoute(builder: (context) => SessionPage(sessions: sessions)));
+                    await context.navigator.push(MaterialPageRoute(builder: (context) => SessionPage(sessions: sessions, currentSafeId: data!.currentSafeId)));
                     reload();
                   }, child: Text("${sessions.length} Active ${Word.fromCount(sessions.length, singular: Word("Session"))}")),
                   SizedBox(height: 20),
@@ -107,7 +108,9 @@ class _HomeState extends State<Home> {
 
 class SessionPage extends StatefulWidget {
   final List<AccountDetailsPost200ResponseDataSessionsInner> sessions;
-  const SessionPage({super.key, required this.sessions});
+  final String currentSafeId;
+
+  const SessionPage({super.key, required this.sessions, required this.currentSafeId});
 
   @override
   State<SessionPage> createState() => _SessionPageState();
@@ -116,7 +119,7 @@ class SessionPage extends StatefulWidget {
 class _SessionPageState extends State<SessionPage> {
   @override
   Widget build(BuildContext context) {
-    final sessions = widget.sessions;
+    final sessions = widget.sessions.sorted((a, b) => b.used.compareTo(a.used));
 
     return Scaffold(
       appBar: AppBar(title: Text("${sessions.length} Sessions")),
@@ -124,7 +127,7 @@ class _SessionPageState extends State<SessionPage> {
         child: SingleChildScrollView(
           child: Column(
             spacing: 24,
-            children: sessions.map((x) => SessionWidget(session: x)).toList(),
+            children: sessions.map((x) => SessionWidget(session: x, currentSafeId: widget.currentSafeId)).toList(),
           ),
         ),
       ),
@@ -134,7 +137,9 @@ class _SessionPageState extends State<SessionPage> {
 
 class SessionWidget extends StatefulWidget {
   final AccountDetailsPost200ResponseDataSessionsInner session;
-  const SessionWidget({super.key, required this.session});
+  final String currentSafeId;
+
+  const SessionWidget({super.key, required this.session, required this.currentSafeId});
 
   @override
   State<SessionWidget> createState() => _SessionWidgetState();
@@ -143,7 +148,9 @@ class SessionWidget extends StatefulWidget {
 class _SessionWidgetState extends State<SessionWidget> {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(onPressed: () {
+    final ua = tryCatch(() => UaParser.parse(widget.session.userAgent!));
+
+    void show() {
       final _context = context;
 
       showModalBottomSheet(
@@ -151,8 +158,14 @@ class _SessionWidgetState extends State<SessionWidget> {
         builder: (context) => ListView(
           shrinkWrap: true,
           children: [
-            ListTile(title: Text('View ID'), onTap: () async {
-              await SimpleDialogue.show(context: context, title: "ID", content: SelectableText(widget.session.id), copy: true);
+            ListTile(title: Text('View Info'), onTap: () {
+              final session = widget.session;
+
+              SimpleDialogue.show(context: context, title: "Session Info", content: SelectableText([
+                "IP address: ${session.ip}",
+                "User agent: ${session.userAgent}",
+                "Safe ID: ${session.safeId}",
+              ].join("\n")));
             }),
             ListTile(title: Text('Delete', style: TextStyle(color: Colors.redAccent)), onTap: () async {
               final confirm = await ConfirmationDialogue.show(context: context, title: "Are you sure?", description: "This device will be logged out immediately.");
@@ -164,7 +177,7 @@ class _SessionWidgetState extends State<SessionWidget> {
                 if (outer && _context.mounted) Navigator.pop(_context);
               }
 
-              final result = await request(() => DefaultApi(client).accountSessionDelete(accountSessionDeleteRequest: AccountSessionDeleteRequest(id: widget.session.id)));
+              final result = await request(() => DefaultApi(client).accountSessionDelete(accountSessionDeleteRequest: AccountSessionDeleteRequest(id: widget.session.safeId)));
               if (result == null) return pop(outer: false);
 
               if (result.f != null) {
@@ -182,25 +195,46 @@ class _SessionWidgetState extends State<SessionWidget> {
           ],
         ),
       );
-    }, child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        spacing: 8,
-        children: [
-          SelectableText([?widget.session.ip, ?widget.session.userAgent].nullIfEmpty?.join(" ") ?? "No details", style: TextStyle(fontSize: 20)),
-          SelectableText("Created: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.created)}"),
-          SelectableText("Last used: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.used)}"),
-          SelectableText("Expires: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.expires)}"),
-          if (widget.session.id == prefs.getString("authentication")) Text("This Session", style: TextStyle(color: Colors.amberAccent)),
-          SelectableText(widget.session.id, style: TextStyle(fontSize: 8, color: Colors.grey)),
-        ],
-      ),
-    ), style: ElevatedButton.styleFrom(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ));
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ElevatedButton(onPressed: () {
+          show();
+        }, child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.currentSafeId == widget.session.safeId) SelectableText("This Session"),
+              if (ua != null) ...[
+                ...[
+                  ?SelectableText([?ua.device.vendor, ?ua.device.model].nullIfEmpty?.join(" ") ?? "", style: TextStyle(fontSize: 20)).nullIfEmpty,
+                  ?SelectableText([?ua.browser.major, ?ua.browser.name, ?ua.browser.version, ?ua.engine.name].nullIfEmpty?.join(" ") ?? "", style: TextStyle(fontSize: 16)).nullIfEmpty,
+                  ?SelectableText([?ua.os.name, ?ua.os.version, ?ua.cpu.architecture].nullIfEmpty?.join(" ") ?? "", style: TextStyle(fontSize: 16)).nullIfEmpty,
+                ].nullIfEmpty ?? [SelectableText("Unknown Device").fontSize(20)],
+                SelectableText("IP address: ${widget.session.ip ?? "Unknown"}"),
+              ] else ...[
+                SelectableText("IP address: ${widget.session.ip ?? "Unknown"}", style: TextStyle(fontSize: 20))
+              ],
+              SizedBox(height: 10),
+              SelectableText("Created: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.created.toLocal())}"),
+              SelectableText("Last used: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.used.toLocal())}"),
+              SelectableText("Expires: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.expires.toLocal())}"),
+            ],
+          ),
+        ), style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        )),
+        SizedBox(width: 12),
+        IconButton(onPressed: () {
+          show();
+        }, icon: Icon(Icons.more_vert), iconSize: 36),
+      ],
+    );
   }
 }
