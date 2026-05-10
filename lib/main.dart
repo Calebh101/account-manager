@@ -25,7 +25,6 @@ void main() async {
   runApp(kDebugMode ? DebugApp() : MyApp());
 }
 
-
 class DebugApp extends StatefulWidget {
   const DebugApp({super.key});
 
