@@ -100,19 +100,6 @@ class _VerifyEmailState extends State<VerifyPage> {
 
                 final api = DefaultApi(client);
                 await widget.request.call(context, api, widget.parameters.map((k, v) => MapEntry(k, (value: getController(k).text, details: v))));
-                /*final result = await request(() async => api.authVerifyUserPost(authVerifyUserPostRequest: AuthVerifyUserPostRequest(email: widget.email!, code: widget.verificationCode!, sessionId: widget.sessionId!)));
-
-                if (result?.t != null) {
-                  final t = result!.t!;
-                  if (context.mounted) SnackBarManager.show(context, t.message);
-                } else if (result?.f != null) {
-                  final f = result!.f!;
-                  Logger.print("Verify", "Request failed: $f");
-                  if (context.mounted) SnackBarManager.show(context, f.message ?? "Email not verified. Unknown error: ${f.e}");
-                } else {
-                  Logger.print("Verify", "Request failed");
-                  if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your email was verified or not.");
-                }*/
               },
               style: ElevatedButton.styleFrom(
                 fixedSize: Size(150, 70),

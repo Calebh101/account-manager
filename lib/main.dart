@@ -50,7 +50,7 @@ class _DebugAppState extends State<DebugApp> {
               Spacer(),
               Text(inputtedQueryPath ?? "Path not set"),
               Spacer(),
-              ...["verifyEmail", "changeEmail1", "changeEmail2", "deleteAccount"].map((key) {
+              ...["verifyEmail", "changeEmail1", "changeEmail2", "deleteAccount", "forgotPassword"].map((key) {
                 return TextButton(onPressed: () {
                   inputtedQueryPath = key;
                   setState(() {});
@@ -233,6 +233,45 @@ class MyApp extends StatelessWidget {
               } else {
                 Logger.print("Verify", "Request failed");
                 if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your account was deleted or not.");
+              }
+            },
+          );
+
+          break;
+        case "forgotPassword":
+          widget = VerifyPage(
+            "Forgot Password", {
+              "email": VerifyPageDetails(prettyName: "Email", queryName: "email", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (!isEmail(input)) return "Invalid email.";
+                return null;
+              }),
+              "code": VerifyPageDetails(prettyName: "Verification Code", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length != 6) return "Code must be 6 characters.";
+                return null;
+              }),
+              "password": VerifyPageDetails(prettyName: "New Password", queryName: "", validator: (input) {
+                if (input == null || input.trim().isEmpty) return "Input cannot be empty.";
+                if (input.length < 8) return "Code must be at least 8 characters.";
+                return null;
+              }),
+            },
+            query: uri.queryParameters,
+            request: (context, api, parameters) async {
+              SnackBarManager.show(context, "Loading...");
+              final result = await request(() async => api.accountPasswordForgotVerifyPost(accountPasswordForgotVerifyPostRequest: AccountPasswordForgotVerifyPostRequest(code: parameters["code"]!.value, email: parameters["email"]!.value, password: parameters["password"]!.value)));
+
+              if (result?.t != null) {
+                final t = result!.t!;
+                if (context.mounted) SnackBarManager.show(context, t.message);
+              } else if (result?.f != null) {
+                final f = result!.f!;
+                Logger.print("Verify", "Request failed: $f");
+                if (context.mounted) SnackBarManager.show(context, f.message ?? "Password not changed. Unknown error: ${f.e}");
+              } else {
+                Logger.print("Verify", "Request failed");
+                if (context.mounted) SnackBarManager.show(context, "An unhandled error has occurred. We don't know if your password was changed or not.");
               }
             },
           );
