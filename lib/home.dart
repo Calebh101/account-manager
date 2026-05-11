@@ -149,6 +149,8 @@ class _SessionWidgetState extends State<SessionWidget> {
   @override
   Widget build(BuildContext context) {
     final ua = tryCatch(() => UaParser.parse(widget.session.userAgent!));
+    final session = widget.session;
+    final location = session.location;
 
     void show() {
       final _context = context;
@@ -159,8 +161,6 @@ class _SessionWidgetState extends State<SessionWidget> {
           shrinkWrap: true,
           children: [
             ListTile(title: Text('View Info'), onTap: () {
-              final session = widget.session;
-
               SimpleDialogue.show(context: context, title: "Session Info", content: SelectableText([
                 "IP address: ${session.ip}",
                 "User agent: ${session.userAgent}",
@@ -219,6 +219,8 @@ class _SessionWidgetState extends State<SessionWidget> {
               ] else ...[
                 SelectableText("IP address: ${widget.session.ip ?? "Unknown"}", style: TextStyle(fontSize: 20))
               ],
+              SizedBox(height: 10),
+              SelectableText([?location.city, ?location.region, ?location.country].join(", ").nullIfEmpty ?? "No location found."),
               SizedBox(height: 10),
               SelectableText("Created: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.created.toLocal())}"),
               SelectableText("Last used: ${DateFormat("MMM d, y @ h:mm a").format(widget.session.used.toLocal())}"),

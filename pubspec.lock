@@ -37,9 +37,9 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: "5acc58149e5d66e22e7e40dadbefa441d70edf58"
-      resolved-ref: "5acc58149e5d66e22e7e40dadbefa441d70edf58"
-      url: "https://github.com/Calebh101/calebh101_server.git"
+      ref: "9b1c86c02a0fb897324821ac573ccd137437326e"
+      resolved-ref: "9b1c86c02a0fb897324821ac573ccd137437326e"
+      url: "https://github.com/Calebh101/calebh101_server"
     source: git
     version: "1.0.0"
   calebh101_server_flutter:
@@ -47,8 +47,8 @@ packages:
     description:
       path: flutter
       ref: main
-      resolved-ref: "5acc58149e5d66e22e7e40dadbefa441d70edf58"
-      url: "https://github.com/Calebh101/calebh101_server.git"
+      resolved-ref: "9b1c86c02a0fb897324821ac573ccd137437326e"
+      url: "https://github.com/Calebh101/calebh101_server"
     source: git
     version: "0.0.0"
   characters:
@@ -320,9 +320,9 @@ packages:
     dependency: transitive
     description:
       path: api_client
-      ref: "5acc58149e5d66e22e7e40dadbefa441d70edf58"
-      resolved-ref: "5acc58149e5d66e22e7e40dadbefa441d70edf58"
-      url: "https://github.com/Calebh101/calebh101_server.git"
+      ref: "9b1c86c02a0fb897324821ac573ccd137437326e"
+      resolved-ref: "9b1c86c02a0fb897324821ac573ccd137437326e"
+      url: "https://github.com/Calebh101/calebh101_server"
     source: git
     version: "1.0.0"
   path:
