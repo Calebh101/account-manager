@@ -85,6 +85,10 @@ class _HomeState extends State<Home> {
                     reload();
                   }, child: Text("Sign Out")),
                   TextButton(onPressed: () async {
+                    await showDialog(context: context, builder: (context) => ForgotPasswordDialogue(defaultEmail: data!.email, client: client));
+                  }, child: Text("Forgot Password")),
+                  SizedBox(height: 20),
+                  TextButton(onPressed: () async {
                     await showDialog(context: context, builder: (context) => EmailChangeDialogue());
                     reload();
                   }, child: Text("Change Email")),
