@@ -1,11 +1,11 @@
 {
-    "name": "calebh101_account_page",
-    "short_name": "calebh101_account_page",
+    "name": "Calebh101 Account",
+    "short_name": "Calebh101 Account",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#hexcode",
+    "theme_color": "#hexcode",
+    "description": "Manage your Calebh101 account.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
